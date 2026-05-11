@@ -2,8 +2,6 @@
 
 require_once __DIR__ . '/includes/logger.php';
 
-// $mysqli = new mysqli('localhost', 'root', 'CompetitionDemo1!', 'bytebeir_bme_comp');
-
 $mysqli = new mysqli('localhost', 'root', '', 'bme_comp');
 
 if ($mysqli->connect_errno) {
