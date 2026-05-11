@@ -60,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $hash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $mysqli->prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)');
+    $stmt = $mysqli->prepare('INSERT INTO users (username, password, role, is_active) VALUES (?, ?, ?, 1)');
     if ($stmt === false) {
         error_log('register prepare failed: ' . $mysqli->error);
-        register_redirect('error=' . urlencode('Registration is temporarily unavailable. If you just added the role column, run sql/001_add_user_role.sql.'));
+        register_redirect('error=' . urlencode('Registration is temporarily unavailable. Run sql/001_add_user_role.sql and sql/002_phase1_domain.sql if the database is not migrated.'));
     }
 
     $stmt->bind_param('sss', $username, $hash, $role);
