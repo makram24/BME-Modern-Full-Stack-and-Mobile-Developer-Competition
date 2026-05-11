@@ -1,0 +1,274 @@
+/**
+ * Portal UI — single app stylesheet (auth / register / shared).
+ * Load after Bootstrap; overrides Bootstrap where needed.
+ */
+
+/* --- Reset --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- Auth pages (sign in, register): full-viewport centered card --- */
+body.auth-body {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif;
+  color: #d6d6d6;
+}
+
+/* --- Sign in (index) --- */
+.login-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header img {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.login-header h1 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.login-header p {
+  color: #999;
+  font-size: 0.95rem;
+}
+
+.login-card .form-group {
+  margin-bottom: 20px;
+}
+
+.login-card .form-label {
+  display: block;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.login-card .form-label i {
+  margin-right: 8px;
+  color: #4dabf7;
+}
+
+.login-card .form-control {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.login-card .form-control:focus {
+  outline: none;
+  border-color: #4dabf7;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
+}
+
+.login-card .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(77, 171, 247, 0.4);
+}
+
+.login-card .alert {
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.login-card .alert-danger {
+  background: rgba(255, 107, 107, 0.2);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  color: #ff6b6b;
+}
+
+.login-card .alert-success {
+  background: rgba(81, 207, 102, 0.2);
+  border: 1px solid rgba(81, 207, 102, 0.5);
+  color: #51cf66;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.back-link a {
+  color: #999;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4dabf7;
+}
+
+.back-link-sep {
+  color: #666;
+  margin: 0 8px;
+}
+
+/* --- Register --- */
+.card-wrap {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+}
+
+.card-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.card-panel h1 {
+  color: #fff;
+  font-size: 1.65rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.card-panel .sub {
+  color: #999;
+  font-size: 0.9rem;
+  margin-bottom: 22px;
+}
+
+.card-panel .form-label {
+  color: #fff;
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.card-panel .form-control,
+.card-panel .form-select {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.card-panel .form-control:focus,
+.card-panel .form-select:focus {
+  outline: none;
+  border-color: #4dabf7;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.card-panel .form-select option {
+  color: #111;
+}
+
+.card-panel .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.btn-submit:hover {
+  filter: brightness(1.05);
+}
+
+.card-panel .alert-danger {
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  background: rgba(255, 107, 107, 0.2);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  color: #ff6b6b;
+  font-size: 0.9rem;
+}
+
+.card-panel .hint {
+  color: #888;
+  font-size: 0.8rem;
+  margin-top: -10px;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.footer-link {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.footer-link a {
+  color: #4dabf7;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.footer-link a:hover {
+  text-decoration: underline;
+}

@@ -92,81 +92,12 @@ ob_end_flush();
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Create account — Portal</title>
   <link href="assets/img/favicon.webp" rel="icon">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #d6d6d6;
-    }
-    .card-wrap { width: 100%; max-width: 480px; padding: 20px; }
-    .card-panel {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 36px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-    .card-panel h1 {
-      color: #fff;
-      font-size: 1.65rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .card-panel .sub { color: #999; font-size: 0.9rem; margin-bottom: 22px; }
-    .form-label { color: #fff; font-size: 0.88rem; margin-bottom: 6px; display: block; }
-    .form-control, .form-select {
-      width: 100%;
-      padding: 11px 14px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      margin-bottom: 16px;
-    }
-    .form-control:focus, .form-select:focus {
-      outline: none;
-      border-color: #4dabf7;
-      background: rgba(255, 255, 255, 0.15);
-    }
-    .form-select option { color: #111; }
-    .form-control::placeholder { color: rgba(255, 255, 255, 0.45); }
-    .btn-submit {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 6px;
-    }
-    .btn-submit:hover { filter: brightness(1.05); }
-    .alert-danger {
-      padding: 12px 14px;
-      border-radius: 8px;
-      margin-bottom: 18px;
-      background: rgba(255, 107, 107, 0.2);
-      border: 1px solid rgba(255, 107, 107, 0.5);
-      color: #ff6b6b;
-      font-size: 0.9rem;
-    }
-    .hint { color: #888; font-size: 0.8rem; margin-top: -10px; margin-bottom: 14px; line-height: 1.4; }
-    .footer-link { text-align: center; margin-top: 20px; }
-    .footer-link a { color: #4dabf7; text-decoration: none; font-size: 0.9rem; }
-    .footer-link a:hover { text-decoration: underline; }
-  </style>
+  <link href="assets/css/style.css" rel="stylesheet">
 </head>
-<body>
+<body class="auth-body">
   <div class="card-wrap">
     <div class="card-panel">
       <h1><i class="bi bi-person-plus"></i> Create account</h1>

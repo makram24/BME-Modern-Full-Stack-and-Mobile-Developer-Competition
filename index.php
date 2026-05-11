@@ -31,160 +31,9 @@ if (!empty($_SESSION['logged_in']) && !empty($_SESSION['user_id'])) {
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Poppins', sans-serif;
-      color: #d6d6d6;
-    }
-    
-    .login-container {
-      width: 100%;
-      max-width: 450px;
-      padding: 20px;
-    }
-    
-    .login-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-    
-    .login-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .login-header img {
-      width: 150px;
-      margin-bottom: 20px;
-    }
-    
-    .login-header h1 {
-      color: #fff;
-      font-size: 2rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    
-    .login-header p {
-      color: #999;
-      font-size: 0.95rem;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      color: #fff;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-    
-    .form-label i {
-      margin-right: 8px;
-      color: #4dabf7;
-    }
-    
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-      outline: none;
-      border-color: #4dabf7;
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
-    }
-    
-    .form-control::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-    
-    .btn-login {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    
-    .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(77, 171, 247, 0.4);
-    }
-    
-    .alert {
-      padding: 12px 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-    }
-    
-    .alert-danger {
-      background: rgba(255, 107, 107, 0.2);
-      border: 1px solid rgba(255, 107, 107, 0.5);
-      color: #ff6b6b;
-    }
-    
-    .alert-success {
-      background: rgba(81, 207, 102, 0.2);
-      border: 1px solid rgba(81, 207, 102, 0.5);
-      color: #51cf66;
-    }
-    
-    .back-link {
-      text-align: center;
-      margin-top: 20px;
-    }
-    
-    .back-link a {
-      color: #999;
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
-    }
-    
-    .back-link a:hover {
-      color: #4dabf7;
-    }
-  </style>
+  <link href="assets/css/style.css" rel="stylesheet">
 </head>
-<body>
+<body class="auth-body">
   <div class="login-container">
     <div class="login-card">
       <div class="login-header">
@@ -233,7 +82,7 @@ if (!empty($_SESSION['logged_in']) && !empty($_SESSION['user_id'])) {
       
       <div class="back-link">
         <a href="register.php">Create an account</a>
-        <span style="color:#666;margin:0 8px">·</span>
+        <span class="back-link-sep">·</span>
         <a href="index.php"><i class="bi bi-arrow-left"></i> Back to Home</a>
       </div>
     </div>
