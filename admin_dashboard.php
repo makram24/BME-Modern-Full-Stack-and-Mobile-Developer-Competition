@@ -5,24 +5,40 @@ require_once __DIR__ . '/require_login.php';
 require_once __DIR__ . '/includes/authz.php';
 require_roles('administrator');
 
+require_once __DIR__ . '/includes/admin_common.php';
+
 $shell_title = 'Administrator';
-$shell_nav_items = [
-    ['admin_dashboard.php', 'Home'],
-    ['logout.php', 'Log out'],
+$shell_nav_items = admin_portal_nav_items();
+
+$links = [
+    ['admin_users.php', 'Users', 'Create and edit students and teachers (passwords hashed).'],
+    ['admin_classes.php', 'Classes', 'Start date + class code (identifier), display name.'],
+    ['admin_subjects.php', 'Subjects', 'Catalog: title, description, books, lesson outline.'],
+    ['admin_enrollments.php', 'Enrolments', 'Place students into a class for an academic year.'],
+    ['admin_assignments.php', 'Assignments', 'Assign subject + teacher to a class for a year.'],
 ];
-$shell_body_html = <<<'HTML'
+
+ob_start();
+?>
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-lg-10">
     <h1 class="h3 mb-3">School administrator</h1>
-    <p class="text-muted">Manage students and teachers, subjects, and class assignments for each year. You cannot manage <strong>super-administrator</strong> accounts (that stays with super-admins).</p>
-    <div class="card shadow-sm mb-3">
-      <div class="card-body">
-        <h2 class="h6 card-title">Helper in code</h2>
-        <p class="card-text small mb-0"><code>admin_can_manage_user_role($role)</code> returns false when a school admin targets a super-admin — use before any user update/delete endpoint.</p>
-      </div>
+    <p class="text-muted">Set up academic years, classes, subjects, enrolments, and teacher assignments. You cannot edit <strong>super-administrator</strong> accounts here.</p>
+
+    <div class="row g-3 mt-2">
+      <?php foreach ($links as $L): ?>
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <h2 class="h5 card-title"><a href="<?php echo htmlspecialchars($L[0], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($L[1], ENT_QUOTES, 'UTF-8'); ?></a></h2>
+              <p class="card-text small text-muted mb-0"><?php echo htmlspecialchars($L[2], ENT_QUOTES, 'UTF-8'); ?></p>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </div>
-HTML;
-
+<?php
+$shell_body_html = ob_get_clean();
 require __DIR__ . '/includes/dashboard_shell.php';
