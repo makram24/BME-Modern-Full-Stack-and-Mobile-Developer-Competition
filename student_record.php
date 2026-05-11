@@ -9,6 +9,8 @@ require_once __DIR__ . '/require_login.php';
 require_once __DIR__ . '/includes/authz.php';
 require_roles('student');
 
+require_once __DIR__ . '/includes/student_data.php';
+
 $self = current_user_id();
 $requested = isset($_GET['id']) ? (int) $_GET['id'] : $self;
 
@@ -16,12 +18,9 @@ if ($requested !== $self) {
     exit_forbidden('You can only view your own profile and results.');
 }
 
+$yearNav = isset($_GET['year_id']) ? (int) $_GET['year_id'] : 0;
 $shell_title = 'My profile';
-$shell_nav_items = [
-    ['student_dashboard.php', 'Student home'],
-    ['student_record.php', 'My profile'],
-    ['logout.php', 'Log out'],
-];
+$shell_nav_items = student_portal_nav_links($yearNav);
 $uid = (string) $self;
 $uname = htmlspecialchars((string) (current_username() ?? ''), ENT_QUOTES, 'UTF-8');
 $shell_body_html = <<<HTML
