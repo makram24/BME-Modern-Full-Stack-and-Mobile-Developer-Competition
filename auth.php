@@ -1,0 +1,67 @@
+<?php
+// Prevent any output before headers
+ob_start();
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/dbConnect.php';
+
+function auth_redirect_error(string $message): void
+{
+    ob_end_clean();
+    header('Location: index.php?error=' . urlencode($message));
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_end_clean();
+    header('Location: index.php');
+    exit();
+}
+
+$username = isset($_POST['username']) ? trim($_POST['username']) : '';
+$password = isset($_POST['password']) ? trim($_POST['password']) : '';
+
+if ($username === '' || $password === '') {
+    auth_redirect_error('Please enter both username and password');
+}
+
+$stmt = $mysqli->prepare('SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1');
+if ($stmt === false) {
+    error_log('auth prepare failed: ' . $mysqli->error);
+    auth_redirect_error('Login temporarily unavailable. Please try again later.');
+}
+
+$stmt->bind_param('s', $username);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$stmt->close();
+
+if ($user === null || !password_verify($password, $user['password'])) {
+    auth_redirect_error('Invalid username or password');
+}
+
+if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
+    $newHash = password_hash($password, PASSWORD_DEFAULT);
+    $rehash = $mysqli->prepare('UPDATE users SET password = ? WHERE id = ?');
+    if ($rehash) {
+        $uid = (int) $user['id'];
+        $rehash->bind_param('si', $newHash, $uid);
+        $rehash->execute();
+        $rehash->close();
+    }
+}
+
+$_SESSION['logged_in'] = true;
+$_SESSION['user_id'] = (int) $user['id'];
+$_SESSION['username'] = $user['username'];
+$_SESSION['role'] = $user['role'] ?? 'student';
+$_SESSION['login_time'] = time();
+
+ob_end_clean();
+header('Location: dashboard.php');
+exit();
