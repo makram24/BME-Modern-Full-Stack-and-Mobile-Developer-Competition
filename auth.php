@@ -29,7 +29,9 @@ if ($username === '' || $password === '') {
     auth_redirect_error('Please enter both username and password');
 }
 
-$stmt = $mysqli->prepare('SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1');
+$stmt = $mysqli->prepare(
+    'SELECT id, username, password, role FROM users WHERE username = ? AND is_active = 1 LIMIT 1'
+);
 if ($stmt === false) {
     error_log('auth prepare failed: ' . $mysqli->error);
     auth_redirect_error('Login temporarily unavailable. Please try again later.');
