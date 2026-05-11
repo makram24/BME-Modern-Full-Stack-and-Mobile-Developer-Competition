@@ -87,15 +87,27 @@ function admin_can_manage_user_role(?string $targetUserRole): bool
 }
 
 /**
- * Teacher-only: whether this teacher is the one allowed to edit grades for an assignment.
- * Phase 5 should verify $assignmentId exists and teacher_user_id matches in the database.
+ * Teacher-only: whether this teacher may edit grades for an assignment.
+ * When $db is passed, verifies the row exists and belongs to this teacher.
  */
-function can_edit_grade(int $teacherUserId, int $assignmentId): bool
+function can_edit_grade(int $teacherUserId, int $assignmentId, ?mysqli $db = null): bool
 {
-    unset($assignmentId);
     if (current_role() !== 'teacher' || current_user_id() !== $teacherUserId) {
         return false;
     }
+    if ($db === null) {
+        return true;
+    }
+    $stmt = $db->prepare(
+        'SELECT 1 FROM class_subject_assignments WHERE id = ? AND teacher_user_id = ? LIMIT 1'
+    );
+    if ($stmt === false) {
+        return false;
+    }
+    $stmt->bind_param('ii', $assignmentId, $teacherUserId);
+    $stmt->execute();
+    $ok = $stmt->get_result()->num_rows > 0;
+    $stmt->close();
 
-    return true;
+    return $ok;
 }
