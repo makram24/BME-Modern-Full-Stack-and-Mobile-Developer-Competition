@@ -1,18 +1,20 @@
 <?php
-// Prevent any output before headers
+declare(strict_types=1);
+
 ob_start();
 
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/dbConnect.php';
 
 function auth_redirect_error(string $message): void
 {
     ob_end_clean();
-    header('Location: index.php?error=' . urlencode($message));
+    $next = sanitize_next($_POST['next'] ?? '');
+    header('Location: index.php?error=' . urlencode($message) . '&next=' . rawurlencode($next));
     exit();
 }
 
@@ -20,6 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ob_end_clean();
     header('Location: index.php');
     exit();
+}
+
+if (!csrf_verify_post()) {
+    auth_redirect_error('Invalid request. Please try signing in again.');
 }
 
 $username = isset($_POST['username']) ? trim($_POST['username']) : '';
@@ -58,12 +64,18 @@ if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
     }
 }
 
+session_regenerate_id(true);
+
 $_SESSION['logged_in'] = true;
 $_SESSION['user_id'] = (int) $user['id'];
 $_SESSION['username'] = $user['username'];
 $_SESSION['role'] = $user['role'] ?? 'student';
 $_SESSION['login_time'] = time();
 
+csrf_rotate();
+
+$next = sanitize_next($_POST['next'] ?? '');
+
 ob_end_clean();
-header('Location: dashboard.php');
+header('Location: ' . $next);
 exit();

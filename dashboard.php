@@ -1,12 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+declare(strict_types=1);
 
-if (empty($_SESSION['logged_in']) || empty($_SESSION['user_id'])) {
-    header('Location: index.php');
-    exit();
-}
+require_once __DIR__ . '/require_login.php';
 
 $displayName = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : 'User';
 $roleLabel = isset($_SESSION['role']) ? htmlspecialchars(str_replace('_', ' ', (string) $_SESSION['role']), ENT_QUOTES, 'UTF-8') : '';

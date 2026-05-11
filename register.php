@@ -9,6 +9,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/includes/security.php';
+
 if (!empty($_SESSION['logged_in']) && !empty($_SESSION['user_id'])) {
     ob_end_clean();
     header('Location: dashboard.php');
@@ -28,6 +30,10 @@ function register_redirect(string $query): void
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_verify_post()) {
+        register_redirect('error=' . urlencode('Invalid request. Please submit the form again.'));
+    }
+
     require_once __DIR__ . '/dbConnect.php';
 
     $username = isset($_POST['username']) ? trim($_POST['username']) : '';
@@ -78,6 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmt->close();
 
+    csrf_rotate();
+
     ob_end_clean();
     header('Location: index.php?registered=1');
     exit();
@@ -108,6 +116,7 @@ ob_end_flush();
       <?php endif; ?>
 
       <form method="post" action="register.php" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
         <label class="form-label" for="username">Username</label>
         <input class="form-control" id="username" name="username" type="text" placeholder="letters, numbers, underscore" required minlength="3" maxlength="64" pattern="[a-zA-Z0-9_]+">
 
