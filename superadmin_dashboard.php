@@ -12,30 +12,22 @@ $shell_nav_items = superadmin_portal_nav_items();
 
 ob_start();
 ?>
-<div class="row">
-  <div class="col-lg-10">
-    <h1 class="h3 mb-3">Super administrator</h1>
-    <p class="text-muted">Create and manage <strong>administrator</strong> and <strong>super-administrator</strong> accounts. You can also open any user and change role, activation, or password. Regular school admins receive <strong>403</strong> on these routes.</p>
+<div class="portal-page-head">
+  <h1>Super administrator</h1>
+  <p class="text-muted">Manage privileged accounts. School admins cannot access these screens. Regular users are edited here only when you need full control (role, activation, password).</p>
+</div>
 
-    <div class="row g-3 mt-2">
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100 border-danger">
-          <div class="card-body">
-            <h2 class="h5 card-title"><a href="superadmin_users.php">Privileged users</a></h2>
-            <p class="card-text small text-muted mb-0">Create school admins or other super-admins, and edit any account (including role changes).</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <h2 class="h5 card-title"><a href="events.php">School events</a></h2>
-            <p class="card-text small text-muted mb-0">Read-only campus calendar (school administrators manage events).</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="portal-tiles">
+  <a class="portal-tile portal-tile--danger" href="superadmin_users.php">
+    <i class="bi bi-shield-lock portal-tile__icon" aria-hidden="true"></i>
+    <span class="portal-tile__label">Privileged users</span>
+    <span class="portal-tile__hint">Administrators and super-admins; role and password changes.</span>
+  </a>
+  <a class="portal-tile" href="events.php">
+    <i class="bi bi-calendar-event portal-tile__icon" aria-hidden="true"></i>
+    <span class="portal-tile__label">School events</span>
+    <span class="portal-tile__hint">Read-only campus calendar (school admins manage content).</span>
+  </a>
 </div>
 <?php
 $shell_body_html = ob_get_clean();

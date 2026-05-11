@@ -10,6 +10,7 @@ require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/teacher_data.php';
 require_once __DIR__ . '/includes/grade_weights.php';
 require_once __DIR__ . '/includes/timetable_slots.php';
+require_once __DIR__ . '/includes/subject_assignments_upload.php';
 
 $tid = (int) current_user_id();
 
@@ -75,6 +76,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $uw->close();
         $mysqli->commit();
+        teacher_redirect_assignment($assignmentId, $redirectYear, 'saved=1', $rosterPageRedirect);
+    }
+
+    if ($action === 'create_subject_assignment') {
+        $raw = [
+            'title' => $_POST['title'] ?? '',
+            'instructions' => $_POST['instructions'] ?? '',
+            'due_at' => $_POST['due_at'] ?? '',
+        ];
+        $v = subject_assignment_validate_create($raw);
+        if (($v['err'] ?? '') !== null) {
+            teacher_redirect_assignment($assignmentId, $redirectYear, 'error=' . rawurlencode((string) $v['err']), $rosterPageRedirect);
+        }
+
+        $err = subject_assignment_create(
+            $mysqli,
+            $assignmentId,
+            $tid,
+            (string) $v['title'],
+            $v['instructions'],
+            $v['due_at']
+        );
+        if ($err !== null) {
+            teacher_redirect_assignment($assignmentId, $redirectYear, 'error=' . rawurlencode($err), $rosterPageRedirect);
+        }
+
+        csrf_rotate();
+        teacher_redirect_assignment($assignmentId, $redirectYear, 'saved=1', $rosterPageRedirect);
+    }
+
+    if ($action === 'delete_subject_assignment') {
+        $subjectAssignmentId = (int) ($_POST['subject_assignment_id'] ?? 0);
+        if ($subjectAssignmentId <= 0) {
+            teacher_redirect_assignment($assignmentId, $redirectYear, 'error=' . rawurlencode('Invalid assignment.'), $rosterPageRedirect);
+        }
+        $ok = subject_assignment_delete($mysqli, $subjectAssignmentId, $tid);
+        if (!$ok) {
+            teacher_redirect_assignment($assignmentId, $redirectYear, 'error=' . rawurlencode('Could not delete assignment.'), $rosterPageRedirect);
+        }
+
+        csrf_rotate();
         teacher_redirect_assignment($assignmentId, $redirectYear, 'saved=1', $rosterPageRedirect);
     }
 
@@ -186,6 +228,19 @@ if ($rosterPage > $totalPages) {
 $roster = teacher_roster_page($mysqli, $classId, $yearId, $rosterPage);
 $grades = teacher_grades_for_assignment($mysqli, $assignmentId);
 
+$subjectAssignments = subject_assignments_list($mysqli, $assignmentId);
+$rosterStudentIds = array_map(static fn (array $r): int => (int) $r['student_id'], $roster);
+$submissions = subject_submissions_list_for_class_subject($mysqli, $assignmentId, $rosterStudentIds);
+$submissionsBySubjectAndStudent = [];
+foreach ($submissions as $s) {
+    $saId = (int) $s['subject_assignment_id'];
+    $stId = (int) $s['student_user_id'];
+    if (!isset($submissionsBySubjectAndStudent[$saId])) {
+        $submissionsBySubjectAndStudent[$saId] = [];
+    }
+    $submissionsBySubjectAndStudent[$saId][$stId] = $s;
+}
+
 $gradesByStudent = [];
 foreach ($grades as $g) {
     $sid = (int) $g['student_user_id'];
@@ -241,6 +296,67 @@ ob_start();
       </div>
     </div>
 
+    <?php
+      $csrfTop = htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
+    ?>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-2">Assignments (uploads)</div>
+      <div class="card-body">
+        <form method="post" class="row g-2 align-items-end">
+          <input type="hidden" name="csrf_token" value="<?php echo $csrfTop; ?>">
+          <input type="hidden" name="action" value="create_subject_assignment">
+          <input type="hidden" name="assignment_id" value="<?php echo (int) $assignmentId; ?>">
+          <input type="hidden" name="year_id" value="<?php echo (int) $yearId; ?>">
+          <input type="hidden" name="roster_page" value="<?php echo (int) $rosterPage; ?>">
+
+          <div class="col-md-4">
+            <label class="form-label small">Title</label>
+            <input class="form-control form-control-sm" name="title" maxlength="255" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Due (optional)</label>
+            <input class="form-control form-control-sm" type="datetime-local" name="due_at">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label small">Instructions</label>
+            <input class="form-control form-control-sm" name="instructions" maxlength="5000" placeholder="What should students submit?">
+          </div>
+          <div class="col-md-12 d-flex justify-content-end">
+            <button type="submit" class="btn btn-sm btn-primary">Create assignment</button>
+          </div>
+        </form>
+
+        <?php if ($subjectAssignments !== []): ?>
+          <div class="mt-3">
+            <div class="small text-muted mb-2">Existing assignments</div>
+            <div class="d-flex flex-column gap-2">
+              <?php foreach ($subjectAssignments as $sa): ?>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 portal-card p-2">
+                  <div class="min-w-0">
+                    <div class="fw-semibold"><?php echo htmlspecialchars((string) $sa['title'], ENT_QUOTES, 'UTF-8'); ?></div>
+                    <?php if (!empty($sa['due_at'])): ?>
+                      <div class="small text-muted">Due: <?php echo htmlspecialchars((string) $sa['due_at'], ENT_QUOTES, 'UTF-8'); ?></div>
+                    <?php endif; ?>
+                  </div>
+                  <form method="post" class="m-0" onsubmit="return confirm('Delete this assignment?');">
+                    <input type="hidden" name="csrf_token" value="<?php echo $csrfTop; ?>">
+                    <input type="hidden" name="action" value="delete_subject_assignment">
+                    <input type="hidden" name="assignment_id" value="<?php echo (int) $assignmentId; ?>">
+                    <input type="hidden" name="year_id" value="<?php echo (int) $yearId; ?>">
+                    <input type="hidden" name="roster_page" value="<?php echo (int) $rosterPage; ?>">
+                    <input type="hidden" name="subject_assignment_id" value="<?php echo (int) $sa['id']; ?>">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php else: ?>
+          <div class="small text-muted mt-3">No assignments created yet. Use the form above.</div>
+        <?php endif; ?>
+      </div>
+    </div>
+
     <?php if ($rosterTotal > TEACHER_ROSTER_PAGE_SIZE): ?>
       <nav class="mb-3 d-flex flex-wrap align-items-center gap-2" aria-label="Roster pages">
         <span class="small text-muted"><?php echo (int) $rosterTotal; ?> students · page <?php echo (int) $rosterPage; ?> / <?php echo (int) $totalPages; ?></span>
@@ -271,6 +387,40 @@ ob_start();
           <span class="small text-muted">ID <?php echo $sid; ?></span>
         </div>
         <div class="card-body">
+          <?php if ($subjectAssignments !== []): ?>
+            <h3 class="h6 mb-3">Uploads</h3>
+            <ul class="small list-unstyled mb-3">
+              <?php foreach ($subjectAssignments as $sa): ?>
+                <?php
+                  $saId = (int) $sa['id'];
+                  $sub = $submissionsBySubjectAndStudent[$saId][$sid] ?? null;
+                ?>
+                <li class="mb-2 pb-2 border-bottom border-light">
+                  <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <div class="min-w-0">
+                      <strong><?php echo htmlspecialchars((string) $sa['title'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                      <?php if (!empty($sa['due_at'])): ?>
+                        <div class="small text-muted">Due <?php echo htmlspecialchars((string) $sa['due_at'], ENT_QUOTES, 'UTF-8'); ?></div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="text-end">
+                      <?php if ($sub !== null): ?>
+                        <div class="small text-muted mb-1">
+                          Submitted <?php echo htmlspecialchars((string) ($sub['submitted_at'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                        </div>
+                        <a class="btn btn-sm btn-outline-primary" href="<?php echo htmlspecialchars('download_subject_assignment_submission.php?submission_id=' . (int) $sub['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                          Download
+                        </a>
+                      <?php else: ?>
+                        <div class="small text-muted">Not submitted</div>
+                      <?php endif; ?>
+                    </div>
+                  </div>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          <?php endif; ?>
+
           <h3 class="h6">Recorded grades</h3>
           <?php if ($periodicList === [] && $ye === null && $sem === null): ?>
             <p class="small text-muted">No grades yet.</p>

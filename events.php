@@ -31,31 +31,39 @@ ob_start();
     <?php endif; ?>
 
     <?php if ($events === []): ?>
-      <div class="alert alert-info py-2">No events scheduled<?php echo $filterYear > 0 ? ' for this filter.' : '.'; ?></div>
+      <div class="alert alert-info border-0 shadow-sm">No events scheduled<?php echo $filterYear > 0 ? ' for this filter.' : '.'; ?></div>
     <?php else: ?>
-      <div class="list-group shadow-sm">
+      <div class="d-flex flex-column gap-3">
         <?php foreach ($events as $ev): ?>
-          <div class="list-group-item">
-            <div class="d-flex w-100 justify-content-between flex-wrap gap-2">
-              <h2 class="h6 mb-1"><?php echo htmlspecialchars((string) $ev['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
-              <small class="text-muted text-nowrap"><?php echo htmlspecialchars((string) $ev['starts_at'], ENT_QUOTES, 'UTF-8'); ?>
-                <?php if (!empty($ev['ends_at'])): ?>
-                  → <?php echo htmlspecialchars((string) $ev['ends_at'], ENT_QUOTES, 'UTF-8'); ?>
+          <article class="portal-card p-3 p-md-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-1">
+              <div>
+                <h2 class="h6 mb-1"><?php echo htmlspecialchars((string) $ev['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
+                <?php if (!empty($ev['location'])): ?>
+                  <p class="small mb-1 text-muted">
+                    <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>
+                    <?php echo htmlspecialchars((string) $ev['location'], ENT_QUOTES, 'UTF-8'); ?>
+                  </p>
                 <?php endif; ?>
-              </small>
+              </div>
+              <div class="text-end small text-muted">
+                <div>
+                  <?php echo htmlspecialchars((string) $ev['starts_at'], ENT_QUOTES, 'UTF-8'); ?>
+                  <?php if (!empty($ev['ends_at'])): ?>
+                    <span class="mx-1">→</span><?php echo htmlspecialchars((string) $ev['ends_at'], ENT_QUOTES, 'UTF-8'); ?>
+                  <?php endif; ?>
+                </div>
+                <?php if (!empty($ev['year_label'])): ?>
+                  <div>Year: <?php echo htmlspecialchars((string) $ev['year_label'], ENT_QUOTES, 'UTF-8'); ?></div>
+                <?php elseif (!empty($ev['academic_year_id'])): ?>
+                  <div>Year ID <?php echo (int) $ev['academic_year_id']; ?></div>
+                <?php endif; ?>
+              </div>
             </div>
-            <?php if (!empty($ev['location'])): ?>
-              <p class="small mb-1"><strong>Where:</strong> <?php echo htmlspecialchars((string) $ev['location'], ENT_QUOTES, 'UTF-8'); ?></p>
-            <?php endif; ?>
-            <?php if (!empty($ev['year_label'])): ?>
-              <p class="small text-muted mb-1">Academic year: <?php echo htmlspecialchars((string) $ev['year_label'], ENT_QUOTES, 'UTF-8'); ?></p>
-            <?php elseif (!empty($ev['academic_year_id'])): ?>
-              <p class="small text-muted mb-1">Academic year ID <?php echo (int) $ev['academic_year_id']; ?></p>
-            <?php endif; ?>
             <?php if (!empty($ev['description'])): ?>
               <p class="small mb-0 text-body-secondary"><?php echo nl2br(htmlspecialchars((string) $ev['description'], ENT_QUOTES, 'UTF-8')); ?></p>
             <?php endif; ?>
-          </div>
+          </article>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>

@@ -31,7 +31,6 @@ $shell_body_html = <<<HTML
       <dt class="col-sm-4">User ID</dt><dd class="col-sm-8">{$uid}</dd>
       <dt class="col-sm-4">Username</dt><dd class="col-sm-8">{$uname}</dd>
     </dl>
-    <p class="text-muted small">Opening this page with <code>?id=</code> set to another user returns 403.</p>
   </div>
 </div>
 HTML;

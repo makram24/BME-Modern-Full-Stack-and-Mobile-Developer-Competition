@@ -10,35 +10,30 @@ require_once __DIR__ . '/includes/admin_common.php';
 $shell_title = 'Administrator';
 $shell_nav_items = admin_portal_nav_items();
 
-$links = [
-    ['admin_users.php', 'Users', 'Create and edit students and teachers (passwords hashed).'],
-    ['admin_classes.php', 'Classes', 'Start date + class code (identifier), display name.'],
-    ['admin_subjects.php', 'Subjects', 'Catalog: title, description, books, lesson outline.'],
-    ['admin_enrollments.php', 'Enrolments', 'Place students into a class for an academic year.'],
-    ['admin_assignments.php', 'Assignments', 'Assign subject + teacher to a class for a year; set weekday + lesson period (timetable).'],
-    ['admin_events.php', 'Events', 'Campus calendar (visible read-only to students and teachers).'],
+$sections = [
+    ['admin_users.php', 'Users', 'Students and teachers (secure passwords).', 'bi-people'],
+    ['admin_classes.php', 'Classes', 'Class code, start date, display name.', 'bi-building'],
+    ['admin_subjects.php', 'Subjects', 'Catalog: title, description, books, outline.', 'bi-journal-text'],
+    ['admin_enrollments.php', 'Enrolments', 'Place students in a class for a year.', 'bi-person-badge'],
+    ['admin_assignments.php', 'Assignments', 'Teachers, subjects, and timetable periods.', 'bi-link-45deg'],
+    ['admin_events.php', 'Events', 'Campus calendar visible to everyone.', 'bi-calendar-event'],
 ];
 
 ob_start();
 ?>
-<div class="row">
-  <div class="col-lg-10">
-    <h1 class="h3 mb-3">School administrator</h1>
-    <p class="text-muted">Set up academic years, classes, subjects, enrolments, and teacher assignments. You cannot edit <strong>super-administrator</strong> accounts here.</p>
+<div class="portal-page-head">
+  <h1>School administrator</h1>
+  <p class="text-muted">Set up years, classes, subjects, enrolments, and teaching assignments. You cannot edit <strong>super-administrator</strong> accounts here.</p>
+</div>
 
-    <div class="row g-3 mt-2">
-      <?php foreach ($links as $L): ?>
-        <div class="col-md-6">
-          <div class="card shadow-sm h-100">
-            <div class="card-body">
-              <h2 class="h5 card-title"><a href="<?php echo htmlspecialchars($L[0], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($L[1], ENT_QUOTES, 'UTF-8'); ?></a></h2>
-              <p class="card-text small text-muted mb-0"><?php echo htmlspecialchars($L[2], ENT_QUOTES, 'UTF-8'); ?></p>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-  </div>
+<div class="portal-tiles">
+  <?php foreach ($sections as $L): ?>
+    <a class="portal-tile" href="<?php echo htmlspecialchars($L[0], ENT_QUOTES, 'UTF-8'); ?>">
+      <i class="bi <?php echo htmlspecialchars($L[3], ENT_QUOTES, 'UTF-8'); ?> portal-tile__icon" aria-hidden="true"></i>
+      <span class="portal-tile__label"><?php echo htmlspecialchars($L[1], ENT_QUOTES, 'UTF-8'); ?></span>
+      <span class="portal-tile__hint"><?php echo htmlspecialchars($L[2], ENT_QUOTES, 'UTF-8'); ?></span>
+    </a>
+  <?php endforeach; ?>
 </div>
 <?php
 $shell_body_html = ob_get_clean();

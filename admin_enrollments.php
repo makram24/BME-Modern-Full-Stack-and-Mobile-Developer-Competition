@@ -35,11 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         if ($stmt) {
             $stmt->bind_param('iii', $uid, $classId, $yearId);
-            if (!$stmt->execute()) {
-                if ($stmt->errno === 1062) {
-                    $stmt->close();
+            try {
+                $stmt->execute();
+            } catch (mysqli_sql_exception $e) {
+                $stmt->close();
+                if ((int) $e->getCode() === 1062) {
                     admin_redirect('admin_enrollments.php', 'error=' . rawurlencode('That student is already enrolled for this year.'));
                 }
+                portal_log('admin enrolment insert failed', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+                admin_redirect('admin_enrollments.php', 'error=' . rawurlencode('Could not enrol student. Please try again.'));
             }
             $stmt->close();
         }

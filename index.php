@@ -27,9 +27,6 @@ $nextField = sanitize_next($_GET['next'] ?? '');
   <link href="assets/img/favicon.webp" rel="icon">
   <link href="assets/img/apple-touch-icon.webp" rel="apple-touch-icon">
   
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -39,7 +36,6 @@ $nextField = sanitize_next($_GET['next'] ?? '');
   <div class="login-container">
     <div class="login-card">
       <div class="login-header">
-        <img src="assets/img/logo light.webp" alt="Logo">
         <h1><i class="bi bi-shield-lock"></i> Sign in</h1>
         <p>Enter your credentials to access the portal</p>
       </div>
@@ -86,8 +82,6 @@ $nextField = sanitize_next($_GET['next'] ?? '');
       
       <div class="back-link">
         <a href="register.php">Create an account</a>
-        <span class="back-link-sep">·</span>
-        <a href="index.php"><i class="bi bi-arrow-left"></i> Back to Home</a>
       </div>
     </div>
   </div>
