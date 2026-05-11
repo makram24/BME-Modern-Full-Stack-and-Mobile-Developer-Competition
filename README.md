@@ -6,6 +6,29 @@ PHP + MySQL school portal: students view subjects and grades; teachers manage ro
 
 ---
 
+## Install WAMP and run this project (Windows)
+
+[WAMP](https://www.wampserver.com/en/) bundles **Apache**, **MySQL**, and **PHP** so you can run the portal on your PC without a separate hosting account.
+
+1. **Download and install WAMP** (64-bit build, e.g. *WampServer* for Windows). During setup, allow Apache and MySQL through the firewall if Windows asks.
+2. **Start WAMP** from the system tray icon until it shows **green** (Apache + MySQL running). If it stays orange/red, fix port conflicts (often Skype or IIS using port 80) using WAMP’s menus or documentation.
+3. **Choose a recent PHP version** (recommended **8.1+**): *WAMP icon → PHP → Version* and pick a version that matches the [Run locally](#run-locally) requirements.
+4. **Put the project under the web root**, for example:
+   - `C:\wamp64\www\BME-Portal\`  
+   so that `index.php` lives at `C:\wamp64\www\BME-Portal\index.php` (your folder name can differ).
+5. **Create the MySQL database:**
+   - Open **phpMyAdmin** from the WAMP menu (*Tools → phpMyAdmin*), or browse to `http://localhost/phpmyadmin/`.
+   - Create a database named **`bme_comp`** (utf8mb4 collation is fine).
+6. **Import the schema and seed data:** in phpMyAdmin, select `bme_comp` → **Import** → choose `sql/bme_comp.sql` → Go. Optionally import `sql/012_jury_demo_passwords.sql` afterward for known demo passwords (see [Jury test accounts](#jury-test-accounts)).
+7. **Database credentials (WAMP defaults):** a fresh WAMP install often uses MySQL user **`root`** with an **empty** password. The app’s `dbConnect.php` matches that by default. If you set a MySQL password, copy `config.local.php.example` to **`config.local.php`** in the project root and set `db_pass` (and other keys if needed). That file is gitignored.
+8. **Open the app in the browser:** go to  
+   `http://localhost/BME-Portal/index.php`  
+   (replace `BME-Portal` with your actual folder name under `www`). Sign in; you should be redirected to `dashboard.php`.
+
+**Tip:** If pages show a database error, confirm the database name is exactly `bme_comp` (or matches `db_name` in `config.local.php`) and that import finished without errors.
+
+---
+
 ## Run locally
 
 1. **PHP:** 8.1 or newer recommended (mysqli, `password_hash` / `password_verify`, sessions, JSON).
