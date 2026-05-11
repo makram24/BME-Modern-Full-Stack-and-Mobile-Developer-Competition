@@ -1,0 +1,18 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * Local / production database overrides (Phase 9).
+ *
+ * 1. Copy this file to `config.local.php` in the project root.
+ * 2. Fill in real credentials on your host. Never commit `config.local.php`.
+ *
+ * If `config.local.php` is missing, `dbConnect.php` uses the defaults below
+ * (suitable for a typical WAMP/XAMPP dev box).
+ */
+return [
+    'db_host' => 'localhost',
+    'db_user' => 'root',
+    'db_pass' => '',
+    'db_name' => 'bme_comp',
+];

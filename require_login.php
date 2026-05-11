@@ -7,9 +7,7 @@ declare(strict_types=1);
  */
 require_once __DIR__ . '/includes/security.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+portal_ensure_session_started();
 
 if (!empty($_SESSION['logged_in']) && !empty($_SESSION['user_id'])) {
     return;

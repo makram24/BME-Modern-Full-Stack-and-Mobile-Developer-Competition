@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/session_bootstrap.php';
+
 /**
  * Safe post-login redirect target: same-folder PHP files only (no open redirects).
  */
@@ -33,9 +35,7 @@ function resolve_login_redirect_target(): string
 
 function csrf_token(): string
 {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    portal_ensure_session_started();
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
@@ -45,9 +45,7 @@ function csrf_token(): string
 
 function csrf_verify_post(): bool
 {
-    if (session_status() === PHP_SESSION_NONE) {
-        return false;
-    }
+    portal_ensure_session_started();
     $sent = $_POST['csrf_token'] ?? '';
     if ($sent === '' || empty($_SESSION['csrf_token'])) {
         return false;

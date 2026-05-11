@@ -1,2 +1,5 @@
 # Local planning — do not publish to GitHub
 DEVELOPMENT-PHASES.md
+
+# Local secrets (Phase 9)
+config.local.php

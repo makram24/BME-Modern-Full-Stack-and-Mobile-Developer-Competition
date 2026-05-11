@@ -2,10 +2,8 @@
 // Prevent output buffering issues
 ob_start();
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    @session_start();
-}
+require_once __DIR__ . '/includes/session_bootstrap.php';
+portal_ensure_session_started();
 
 // Destroy all session data
 $_SESSION = array();

@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 ob_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/includes/session_bootstrap.php';
+portal_ensure_session_started();
 
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/dbConnect.php';

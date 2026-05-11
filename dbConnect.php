@@ -2,7 +2,26 @@
 
 require_once __DIR__ . '/includes/logger.php';
 
-$mysqli = new mysqli('localhost', 'root', '', 'bme_comp');
+$portalDb = [
+    'host' => getenv('PORTAL_DB_HOST') ?: 'localhost',
+    'user' => getenv('PORTAL_DB_USER') ?: 'root',
+    'pass' => getenv('PORTAL_DB_PASS') !== false ? (string) getenv('PORTAL_DB_PASS') : '',
+    'name' => getenv('PORTAL_DB_NAME') ?: 'bme_comp',
+];
+
+$localConfig = __DIR__ . '/config.local.php';
+if (is_file($localConfig)) {
+    $loaded = require $localConfig;
+    if (is_array($loaded)) {
+        foreach (['db_host' => 'host', 'db_user' => 'user', 'db_pass' => 'pass', 'db_name' => 'name'] as $key => $map) {
+            if (array_key_exists($key, $loaded)) {
+                $portalDb[$map] = (string) $loaded[$key];
+            }
+        }
+    }
+}
+
+$mysqli = new mysqli($portalDb['host'], $portalDb['user'], $portalDb['pass'], $portalDb['name']);
 
 if ($mysqli->connect_errno) {
     portal_log('MySQL connection failed', [
