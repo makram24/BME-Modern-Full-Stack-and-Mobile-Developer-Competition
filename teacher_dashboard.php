@@ -48,6 +48,8 @@ ob_start();
 
       <div class="d-flex flex-wrap gap-2 mb-3">
         <a class="btn btn-primary btn-sm" href="teacher_assignments.php<?php echo teacher_year_q($yearId); ?>">My subjects this year</a>
+        <a class="btn btn-outline-secondary btn-sm" href="events.php<?php echo $yearId > 0 ? '?year_id=' . $yearId : ''; ?>">School events</a>
+        <a class="btn btn-outline-secondary btn-sm" href="teacher_timetable.php<?php echo teacher_year_q($yearId); ?>">My timetable</a>
       </div>
 
       <h2 class="h6 text-muted">Quick list</h2>

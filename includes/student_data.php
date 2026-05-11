@@ -10,7 +10,9 @@ function student_portal_nav(): array
     return [
         ['student_dashboard.php', 'Home'],
         ['student_subjects.php', 'Subjects'],
+        ['student_timetable.php', 'Timetable'],
         ['student_results.php', 'Results'],
+        ['events.php', 'Events'],
         ['student_record.php', 'My profile'],
         ['logout.php', 'Log out'],
     ];
@@ -209,7 +211,8 @@ function student_enrollment_with_class(mysqli $db, int $userId, int $yearId): ?a
 function student_assignments_for_class_year(mysqli $db, int $yearId, int $classId): array
 {
     $stmt = $db->prepare(
-        'SELECT csa.id AS assignment_id, csa.subject_id, s.title, s.description, s.required_books, s.lessons_outline,
+        'SELECT csa.id AS assignment_id, csa.subject_id,
+                s.title, s.description, s.required_books, s.lessons_outline,
                 u.username AS teacher_username
          FROM class_subject_assignments csa
          INNER JOIN subjects s ON s.id = csa.subject_id
@@ -272,7 +275,7 @@ function student_assignment_for_user(mysqli $db, int $userId, int $assignmentId)
 function student_grades_for_class_year(mysqli $db, int $userId, int $yearId, int $classId): array
 {
     $stmt = $db->prepare(
-        'SELECT g.id, g.grade_value, g.grade_type, g.label, g.created_at,
+        'SELECT g.id, g.grade_value, g.weight, g.grade_type, g.label, g.created_at,
                 s.title AS subject_title, csa.id AS assignment_id
          FROM grades g
          INNER JOIN class_subject_assignments csa ON csa.id = g.class_subject_assignment_id
@@ -286,6 +289,36 @@ function student_grades_for_class_year(mysqli $db, int $userId, int $yearId, int
         return [];
     }
     $stmt->bind_param('iii', $userId, $yearId, $classId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $out = [];
+    while ($row = $res->fetch_assoc()) {
+        $out[] = $row;
+    }
+    $stmt->close();
+
+    return $out;
+}
+
+/**
+ * Class subjects with a set timetable (for week grid).
+ *
+ * @return list<array<string, mixed>>
+ */
+function student_timetable_assignments(mysqli $db, int $yearId, int $classId): array
+{
+    $stmt = $db->prepare(
+        'SELECT ats.timetable_day, ats.timetable_slot, s.title AS subject_title
+         FROM assignment_timetable_slots ats
+         INNER JOIN class_subject_assignments csa ON csa.id = ats.class_subject_assignment_id
+         INNER JOIN subjects s ON s.id = csa.subject_id
+         WHERE csa.academic_year_id = ? AND csa.class_id = ?
+         ORDER BY ats.timetable_day ASC, ats.timetable_slot ASC, s.title ASC'
+    );
+    if ($stmt === false) {
+        return [];
+    }
+    $stmt->bind_param('ii', $yearId, $classId);
     $stmt->execute();
     $res = $stmt->get_result();
     $out = [];

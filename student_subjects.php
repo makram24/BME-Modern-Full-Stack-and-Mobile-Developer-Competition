@@ -7,6 +7,7 @@ require_roles('student');
 
 require_once __DIR__ . '/dbConnect.php';
 require_once __DIR__ . '/includes/student_data.php';
+require_once __DIR__ . '/includes/timetable_slots.php';
 
 $uid = (int) current_user_id();
 $reqYear = isset($_GET['year_id']) ? (int) $_GET['year_id'] : 0;
@@ -14,6 +15,8 @@ $yearRow = student_resolve_year($mysqli, $uid, $reqYear);
 $yearId = $yearRow ? (int) $yearRow['id'] : 0;
 $enroll = $yearRow ? student_enrollment_with_class($mysqli, $uid, $yearId) : null;
 $assignments = ($enroll !== null) ? student_assignments_for_class_year($mysqli, $yearId, (int) $enroll['class_id']) : [];
+$slotIds = array_map(static fn (array $a): int => (int) $a['assignment_id'], $assignments);
+$slotsByAssignment = timetable_slots_batch($mysqli, $slotIds);
 
 $shell_title = 'Subjects';
 $shell_nav_items = student_portal_nav_links($yearId);
@@ -32,7 +35,7 @@ ob_start();
       </p>
       <div class="table-responsive">
         <table class="table table-sm table-striped align-middle">
-          <thead><tr><th>Subject</th><th>Teacher</th><th></th></tr></thead>
+          <thead><tr><th>Subject</th><th>Teacher</th><th>Timetable</th><th></th></tr></thead>
           <tbody>
             <?php foreach ($assignments as $a): ?>
               <?php
@@ -40,10 +43,12 @@ ob_start();
                 $q = student_year_q($yearId);
                 $sep = $q !== '' ? '&' : '?';
                 $detailHref = 'student_subject.php' . $q . $sep . 'assignment_id=' . $aid;
+                $ttSlots = $slotsByAssignment[$aid] ?? [];
               ?>
               <tr>
                 <td><?php echo htmlspecialchars((string) $a['title'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $a['teacher_username'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td class="small"><?php echo htmlspecialchars(timetable_slots_summary_string($ttSlots), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><a class="btn btn-sm btn-outline-primary" href="<?php echo $detailHref; ?>">Details</a></td>
               </tr>
             <?php endforeach; ?>

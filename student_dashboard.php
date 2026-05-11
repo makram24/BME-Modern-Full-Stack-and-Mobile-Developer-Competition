@@ -61,6 +61,8 @@ ob_start();
       <div class="d-flex flex-wrap gap-2 mb-4">
         <a class="btn btn-primary btn-sm" href="student_subjects.php<?php echo student_year_q($yearId); ?>">View subjects</a>
         <a class="btn btn-outline-primary btn-sm" href="student_results.php<?php echo student_year_q($yearId); ?>">View results</a>
+        <a class="btn btn-outline-secondary btn-sm" href="events.php<?php echo $yearId > 0 ? '?year_id=' . $yearId : ''; ?>">School events</a>
+        <a class="btn btn-outline-secondary btn-sm" href="student_timetable.php<?php echo student_year_q($yearId); ?>">Class timetable</a>
       </div>
     <?php endif; ?>
   </div>

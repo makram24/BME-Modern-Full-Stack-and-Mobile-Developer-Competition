@@ -7,6 +7,7 @@ require_roles('student');
 
 require_once __DIR__ . '/dbConnect.php';
 require_once __DIR__ . '/includes/student_data.php';
+require_once __DIR__ . '/includes/timetable_slots.php';
 
 $uid = (int) current_user_id();
 $assignmentId = isset($_GET['assignment_id']) ? (int) $_GET['assignment_id'] : 0;
@@ -18,6 +19,9 @@ $row = student_assignment_for_user($mysqli, $uid, $assignmentId);
 if ($row === null) {
     exit_forbidden('You do not have access to this subject offering.');
 }
+
+$ttSlots = timetable_slots_list($mysqli, $assignmentId);
+$ttLine = timetable_slots_summary_string($ttSlots);
 
 $yearId = (int) $row['academic_year_id'];
 $shell_title = 'Subject';
@@ -37,6 +41,9 @@ ob_start();
     <p class="text-muted small mb-4">
       Year <?php echo htmlspecialchars((string) $row['year_label'], ENT_QUOTES, 'UTF-8'); ?>
       · Teacher <strong><?php echo htmlspecialchars((string) $row['teacher_username'], ENT_QUOTES, 'UTF-8'); ?></strong>
+      <?php if ($ttLine !== '—'): ?>
+        · Timetable <strong><?php echo htmlspecialchars($ttLine, ENT_QUOTES, 'UTF-8'); ?></strong>
+      <?php endif; ?>
     </p>
 
     <div class="card shadow-sm mb-3">
@@ -59,7 +66,7 @@ ob_start();
     </div>
     <div class="card border-secondary mb-3">
       <div class="card-body py-2">
-        <p class="small text-muted mb-0"><strong>Timetable:</strong> not configured yet (optional competition feature).</p>
+        <p class="small text-muted mb-0"><strong>Timetable:</strong> <?php echo $ttLine === '—' ? 'No periods set yet.' : htmlspecialchars($ttLine, ENT_QUOTES, 'UTF-8'); ?></p>
       </div>
     </div>
   </div>

@@ -14,6 +14,7 @@ function admin_portal_nav(): array
         ['admin_subjects.php', 'Subjects'],
         ['admin_enrollments.php', 'Enrolments'],
         ['admin_assignments.php', 'Assignments'],
+        ['admin_events.php', 'Events'],
         ['logout.php', 'Log out'],
     ];
 }

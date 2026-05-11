@@ -15,7 +15,8 @@ $links = [
     ['admin_classes.php', 'Classes', 'Start date + class code (identifier), display name.'],
     ['admin_subjects.php', 'Subjects', 'Catalog: title, description, books, lesson outline.'],
     ['admin_enrollments.php', 'Enrolments', 'Place students into a class for an academic year.'],
-    ['admin_assignments.php', 'Assignments', 'Assign subject + teacher to a class for a year.'],
+    ['admin_assignments.php', 'Assignments', 'Assign subject + teacher to a class for a year; set weekday + lesson period (timetable).'],
+    ['admin_events.php', 'Events', 'Campus calendar (visible read-only to students and teachers).'],
 ];
 
 ob_start();

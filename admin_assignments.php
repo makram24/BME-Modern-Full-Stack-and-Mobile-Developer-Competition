@@ -8,6 +8,7 @@ require_roles('administrator');
 require_once __DIR__ . '/dbConnect.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/admin_common.php';
+require_once __DIR__ . '/includes/timetable_slots.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upsert') {
     if (!csrf_verify_post()) {
@@ -30,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upser
     }
 
     $stmt = $mysqli->prepare(
-        'INSERT INTO class_subject_assignments (academic_year_id, class_id, subject_id, teacher_user_id)
-         VALUES (?,?,?,?)
+        'INSERT INTO class_subject_assignments (academic_year_id, class_id, subject_id, teacher_user_id, timetable_day, timetable_slot)
+         VALUES (?,?,?,?,0,0)
          ON DUPLICATE KEY UPDATE teacher_user_id = VALUES(teacher_user_id)'
     );
     if ($stmt) {
@@ -65,6 +66,8 @@ $list = $mysqli->query(
      ORDER BY ay.date_end DESC, c.class_code, s.title'
 );
 $assignRows = $list ? $list->fetch_all(MYSQLI_ASSOC) : [];
+$assignmentIds = array_map(static fn (array $a): int => (int) $a['assignment_id'], $assignRows);
+$slotsByAssignment = timetable_slots_batch($mysqli, $assignmentIds);
 
 $shell_title = 'Assignments';
 $shell_nav_items = admin_portal_nav_items();
@@ -74,7 +77,7 @@ ob_start();
 <div class="row">
   <div class="col-lg-11">
     <h1 class="h3 mb-3">Subject → class assignments</h1>
-    <p class="text-muted small">For each <strong>year + class + subject</strong>, set the <strong>teacher</strong>. Saving again updates the teacher if the row already exists.</p>
+    <p class="text-muted small">For each <strong>year + class + subject</strong>, set the <strong>teacher</strong>. Saving again updates the row if it already exists (same year, class, subject). Use <strong>Edit</strong> to add one or more timetable periods (same day twice is allowed).</p>
 
     <?php if (!empty($_GET['saved'])): ?>
       <div class="alert alert-success py-2">Saved.</div>
@@ -121,7 +124,7 @@ ob_start();
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-sm btn-primary">Save assignment</button>
           </div>
         </form>
@@ -131,7 +134,7 @@ ob_start();
     <h2 class="h6 text-muted">Current rows</h2>
     <div class="table-responsive">
       <table class="table table-sm table-striped">
-        <thead><tr><th>Year</th><th>Class</th><th>Subject</th><th>Teacher</th></tr></thead>
+        <thead><tr><th>Year</th><th>Class</th><th>Subject</th><th>Teacher</th><th>Timetable</th><th></th></tr></thead>
         <tbody>
           <?php foreach ($assignRows as $a): ?>
             <tr>
@@ -139,6 +142,8 @@ ob_start();
               <td><?php echo htmlspecialchars((string) $a['class_code'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars((string) $a['subject_title'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars((string) $a['teacher_username'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td class="small"><?php echo htmlspecialchars(timetable_slots_summary_string($slotsByAssignment[(int) $a['assignment_id']] ?? []), ENT_QUOTES, 'UTF-8'); ?></td>
+              <td><a class="btn btn-sm btn-outline-secondary" href="admin_assignment_edit.php?id=<?php echo (int) $a['assignment_id']; ?>">Edit</a></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

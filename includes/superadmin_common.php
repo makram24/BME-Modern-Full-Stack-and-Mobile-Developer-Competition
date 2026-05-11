@@ -10,6 +10,7 @@ function superadmin_portal_nav(): array
     return [
         ['superadmin_dashboard.php', 'Home'],
         ['superadmin_users.php', 'Privileged users'],
+        ['events.php', 'Events'],
         ['logout.php', 'Log out'],
     ];
 }

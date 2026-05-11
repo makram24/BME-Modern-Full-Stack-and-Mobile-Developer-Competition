@@ -52,7 +52,13 @@ $shell_nav_items = admin_portal_nav_items();
 $stmt = $mysqli->query(
     'SELECT id, username, role, is_active, created_at FROM users ORDER BY role ASC, username ASC'
 );
-$users = $stmt ? $stmt->fetch_all(MYSQLI_ASSOC) : [];
+if ($stmt === false) {
+    portal_log('admin_users list query failed', ['errno' => $mysqli->errno, 'error' => $mysqli->error]);
+    $users = [];
+} else {
+    $users = $stmt->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+}
 
 ob_start();
 ?>

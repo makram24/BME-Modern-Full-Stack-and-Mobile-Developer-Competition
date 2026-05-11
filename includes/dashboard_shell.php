@@ -25,25 +25,34 @@ $pageTitle = htmlspecialchars($shell_title, ENT_QUOTES, 'UTF-8');
   <title><?php echo $pageTitle; ?> — Portal</title>
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-  <nav class="navbar navbar-expand navbar-dark bg-dark mb-4">
-    <div class="container">
-      <span class="navbar-brand mb-0 h1 fs-5"><?php echo $pageTitle; ?></span>
-      <div class="navbar-nav ms-auto gap-2 flex-row align-items-center">
-        <span class="text-white-50 small"><?php echo $displayName; ?> · <span class="text-uppercase"><?php echo $roleLabel; ?></span></span>
-        <?php foreach ($shell_nav_items as $nav): ?>
-          <?php
-            $href = htmlspecialchars($nav[0], ENT_QUOTES, 'UTF-8');
-            $label = htmlspecialchars($nav[1], ENT_QUOTES, 'UTF-8');
-          ?>
-          <a class="btn btn-sm btn-outline-light" href="<?php echo $href; ?>"><?php echo $label; ?></a>
-        <?php endforeach; ?>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid px-3">
+      <span class="navbar-brand mb-0 h1 fs-5 text-truncate" style="max-width:55%"><?php echo $pageTitle; ?></span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#portalNavCollapse" aria-controls="portalNavCollapse" aria-expanded="false" aria-label="Toggle menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="portalNavCollapse">
+        <div class="ms-lg-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2 py-2 py-lg-0">
+          <span class="text-white-50 small order-lg-first"><?php echo $displayName; ?> · <span class="text-uppercase"><?php echo $roleLabel; ?></span></span>
+          <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($shell_nav_items as $nav): ?>
+              <?php
+                $href = htmlspecialchars($nav[0], ENT_QUOTES, 'UTF-8');
+                $label = htmlspecialchars($nav[1], ENT_QUOTES, 'UTF-8');
+              ?>
+              <a class="btn btn-sm btn-outline-light" href="<?php echo $href; ?>"><?php echo $label; ?></a>
+            <?php endforeach; ?>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
   <main class="container pb-5">
     <?php echo $shell_body_html; ?>
   </main>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

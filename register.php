@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hash = password_hash($password, PASSWORD_DEFAULT);
     $stmt = $mysqli->prepare('INSERT INTO users (username, password, role, is_active) VALUES (?, ?, ?, 1)');
     if ($stmt === false) {
-        error_log('register prepare failed: ' . $mysqli->error);
+        portal_log('register prepare failed', ['mysqli_error' => $mysqli->error]);
         register_redirect('error=' . urlencode('Registration is temporarily unavailable. Run sql/001_add_user_role.sql and sql/002_phase1_domain.sql if the database is not migrated.'));
     }
 
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
             register_redirect('error=' . urlencode('That username is already taken.'));
         }
-        error_log('register execute failed: ' . $stmt->error);
+        portal_log('register execute failed', ['stmt_error' => $stmt->error, 'errno' => $stmt->errno]);
         $stmt->close();
         register_redirect('error=' . urlencode('Could not create account. Please try again.'));
     }

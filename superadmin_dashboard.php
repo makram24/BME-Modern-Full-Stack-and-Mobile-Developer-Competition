@@ -26,6 +26,14 @@ ob_start();
           </div>
         </div>
       </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="h5 card-title"><a href="events.php">School events</a></h2>
+            <p class="card-text small text-muted mb-0">Read-only campus calendar (school administrators manage events).</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -10,6 +10,8 @@ function teacher_portal_nav(): array
     return [
         ['teacher_dashboard.php', 'Home'],
         ['teacher_assignments.php', 'My subjects'],
+        ['teacher_timetable.php', 'Timetable'],
+        ['events.php', 'Events'],
         ['logout.php', 'Log out'],
     ];
 }
@@ -215,7 +217,61 @@ function teacher_assignment_for_teacher(mysqli $db, int $teacherId, int $assignm
     return $row ?: null;
 }
 
+/** Roster page size for teacher assignment view (Phase 8 pagination). */
+const TEACHER_ROSTER_PAGE_SIZE = 25;
+
+function teacher_roster_count(mysqli $db, int $classId, int $yearId): int
+{
+    $stmt = $db->prepare(
+        'SELECT COUNT(*) AS c FROM class_enrollments ce WHERE ce.class_id = ? AND ce.academic_year_id = ?'
+    );
+    if ($stmt === false) {
+        return 0;
+    }
+    $stmt->bind_param('ii', $classId, $yearId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    return (int) ($row['c'] ?? 0);
+}
+
 /**
+ * One page of roster (ordered by username).
+ *
+ * @return list<array<string, mixed>>
+ */
+function teacher_roster_page(mysqli $db, int $classId, int $yearId, int $page): array
+{
+    $page = max(1, $page);
+    $offset = ($page - 1) * TEACHER_ROSTER_PAGE_SIZE;
+    $limit = TEACHER_ROSTER_PAGE_SIZE;
+    $stmt = $db->prepare(
+        'SELECT u.id AS student_id, u.username
+         FROM class_enrollments ce
+         INNER JOIN users u ON u.id = ce.user_id
+         WHERE ce.class_id = ? AND ce.academic_year_id = ?
+         ORDER BY u.username ASC
+         LIMIT ? OFFSET ?'
+    );
+    if ($stmt === false) {
+        return [];
+    }
+    $stmt->bind_param('iiii', $classId, $yearId, $limit, $offset);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $out = [];
+    while ($row = $res->fetch_assoc()) {
+        $out[] = $row;
+    }
+    $stmt->close();
+
+    return $out;
+}
+
+/**
+ * Full roster (no pagination). Prefer teacher_roster_page for large class lists.
+ *
  * @return list<array<string, mixed>>
  */
 function teacher_roster(mysqli $db, int $classId, int $yearId): array
@@ -248,7 +304,7 @@ function teacher_roster(mysqli $db, int $classId, int $yearId): array
 function teacher_grades_for_assignment(mysqli $db, int $assignmentId): array
 {
     $stmt = $db->prepare(
-        'SELECT g.id, g.student_user_id, g.grade_value, g.grade_type, g.label, g.created_at, u.username
+        'SELECT g.id, g.student_user_id, g.grade_value, g.weight, g.grade_type, g.label, g.created_at, u.username
          FROM grades g
          INNER JOIN users u ON u.id = g.student_user_id
          WHERE g.class_subject_assignment_id = ?
@@ -291,11 +347,14 @@ function teacher_grade_value_valid(string $value): bool
     return (bool) preg_match('/^[1-5]$/', trim($value));
 }
 
-function teacher_assignment_url(int $assignmentId, int $yearId, string $extraQuery = ''): string
+function teacher_assignment_url(int $assignmentId, int $yearId, string $extraQuery = '', int $rosterPage = 0): string
 {
     $u = 'teacher_assignment.php?assignment_id=' . $assignmentId;
     if ($yearId > 0) {
         $u .= '&year_id=' . $yearId;
+    }
+    if ($rosterPage > 1) {
+        $u .= '&page=' . $rosterPage;
     }
     if ($extraQuery !== '') {
         $u .= '&' . ltrim($extraQuery, '&');
@@ -304,8 +363,39 @@ function teacher_assignment_url(int $assignmentId, int $yearId, string $extraQue
     return $u;
 }
 
-function teacher_redirect_assignment(int $assignmentId, int $yearId, string $extraQuery = ''): void
+function teacher_redirect_assignment(int $assignmentId, int $yearId, string $extraQuery = '', int $rosterPage = 0): void
 {
-    header('Location: ' . teacher_assignment_url($assignmentId, $yearId, $extraQuery));
+    header('Location: ' . teacher_assignment_url($assignmentId, $yearId, $extraQuery, $rosterPage));
     exit;
+}
+
+/**
+ * Assignments with a set timetable slot (for week grid).
+ *
+ * @return list<array<string, mixed>>
+ */
+function teacher_timetable_assignments(mysqli $db, int $teacherId, int $yearId): array
+{
+    $stmt = $db->prepare(
+        'SELECT ats.timetable_day, ats.timetable_slot, s.title AS subject_title, c.class_code, c.display_name
+         FROM assignment_timetable_slots ats
+         INNER JOIN class_subject_assignments csa ON csa.id = ats.class_subject_assignment_id
+         INNER JOIN subjects s ON s.id = csa.subject_id
+         INNER JOIN classes c ON c.id = csa.class_id
+         WHERE csa.teacher_user_id = ? AND csa.academic_year_id = ?
+         ORDER BY ats.timetable_day ASC, ats.timetable_slot ASC, s.title ASC'
+    );
+    if ($stmt === false) {
+        return [];
+    }
+    $stmt->bind_param('ii', $teacherId, $yearId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $out = [];
+    while ($row = $res->fetch_assoc()) {
+        $out[] = $row;
+    }
+    $stmt->close();
+
+    return $out;
 }

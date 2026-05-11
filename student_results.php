@@ -7,6 +7,7 @@ require_roles('student');
 
 require_once __DIR__ . '/dbConnect.php';
 require_once __DIR__ . '/includes/student_data.php';
+require_once __DIR__ . '/includes/grade_weights.php';
 
 $uid = (int) current_user_id();
 $reqYear = isset($_GET['year_id']) ? (int) $_GET['year_id'] : 0;
@@ -14,6 +15,16 @@ $yearRow = student_resolve_year($mysqli, $uid, $reqYear);
 $yearId = $yearRow ? (int) $yearRow['id'] : 0;
 $enroll = $yearRow ? student_enrollment_with_class($mysqli, $uid, $yearId) : null;
 $grades = ($enroll !== null) ? student_grades_for_class_year($mysqli, $uid, $yearId, (int) $enroll['class_id']) : [];
+
+$periodicByAssignment = [];
+$subjectTitleByAssignment = [];
+foreach ($grades as $g) {
+    $aid = (int) $g['assignment_id'];
+    $subjectTitleByAssignment[$aid] = (string) $g['subject_title'];
+    if (($g['grade_type'] ?? '') === 'periodic') {
+        $periodicByAssignment[$aid][] = $g;
+    }
+}
 
 $shell_title = 'Results';
 $shell_nav_items = student_portal_nav_links($yearId);
@@ -38,16 +49,23 @@ ob_start();
               <th>Type</th>
               <th>Item</th>
               <th>Grade</th>
+              <th>Weight</th>
               <th>Recorded</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($grades as $g): ?>
+              <?php
+                $wcell = (($g['grade_type'] ?? '') === 'periodic')
+                  ? htmlspecialchars(number_format((float) ($g['weight'] ?? 1), 2, '.', ''), ENT_QUOTES, 'UTF-8')
+                  : '—';
+              ?>
               <tr>
                 <td><?php echo htmlspecialchars((string) $g['subject_title'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $g['grade_type'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) ($g['label'] ?? '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><strong><?php echo htmlspecialchars((string) $g['grade_value'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
+                <td class="small"><?php echo $wcell; ?></td>
                 <td class="small text-muted"><?php echo htmlspecialchars((string) $g['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
               </tr>
             <?php endforeach; ?>
@@ -56,6 +74,18 @@ ob_start();
       </div>
       <?php if ($grades === []): ?>
         <p class="text-muted small">No grades recorded for you in this year yet.</p>
+      <?php elseif ($periodicByAssignment !== []): ?>
+        <h2 class="h6 mt-4">Weighted average by subject (periodic only)</h2>
+        <p class="text-muted small">Uses sum(grade × weight) ÷ sum(weight) for your periodic entries in each subject. Semester and year-end grades are not included.</p>
+        <ul class="small mb-0">
+          <?php foreach ($periodicByAssignment as $aid => $rows): ?>
+            <?php $avg = weighted_periodic_grade_average($rows); ?>
+            <li>
+              <strong><?php echo htmlspecialchars($subjectTitleByAssignment[$aid] ?? 'Subject', ENT_QUOTES, 'UTF-8'); ?>:</strong>
+              <?php echo htmlspecialchars(format_grade_average($avg), ENT_QUOTES, 'UTF-8'); ?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
       <?php endif; ?>
     <?php endif; ?>
   </div>

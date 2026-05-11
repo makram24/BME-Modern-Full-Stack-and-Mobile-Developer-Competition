@@ -272,3 +272,19 @@ body.auth-body {
 .footer-link a:hover {
   text-decoration: underline;
 }
+
+/* --- Dashboard shell (Phase 8): mobile nav + tables --- */
+.navbar-dark .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+main.container .table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Timetable week grid — empty = free period, not a fault */
+.timetable-cell-empty {
+  min-height: 2.25rem;
+  vertical-align: middle;
+  background: rgba(0, 0, 0, 0.02);
+}
